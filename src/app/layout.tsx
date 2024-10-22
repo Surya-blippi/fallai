@@ -14,14 +14,14 @@ export const metadata: Metadata = {
   viewport: 'width=device-width, initial-scale=1',
 }
 
-interface RootLayoutProps {
-  children: React.ReactNode;
-}
-
-export default function RootLayout({ children }: RootLayoutProps) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="en" className="h-full">
-      <body className={`${inter.className} min-h-screen flex flex-col`}>
+    <html lang="en">
+      <body className={inter.className}>
         {/* Header */}
         <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -63,7 +63,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         </header>
 
         {/* Main Content */}
-        <main className="flex-grow">
+        <main className="flex-1 min-h-screen">
           {children}
         </main>
 

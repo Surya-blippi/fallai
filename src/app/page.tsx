@@ -2,7 +2,6 @@
 
 import { useState, useRef } from 'react'
 import Image from 'next/image'
-import { ImagePlus } from 'lucide-react'
 
 export default function Home() {
   const [inputValue, setInputValue] = useState('')
@@ -16,6 +15,7 @@ export default function Home() {
     try {
       // Add your API call here
       console.log('Processing:', inputValue || selectedImage)
+      await new Promise(resolve => setTimeout(resolve, 2000)) // Simulate API call
       setResult('Result will appear here')
     } catch (error) {
       console.error('Error:', error)
@@ -28,12 +28,16 @@ export default function Home() {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setSelectedImage(e.target?.result as string)
-        setInputValue('') // Clear text input when image is selected
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          setSelectedImage(e.target?.result as string)
+          setInputValue('') // Clear text input when image is selected
+        }
+        reader.readAsDataURL(file)
+      } else {
+        alert('Please select an image file')
       }
-      reader.readAsDataURL(file)
     }
   }
 
@@ -41,12 +45,16 @@ export default function Home() {
     event.preventDefault()
     const file = event.dataTransfer.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setSelectedImage(e.target?.result as string)
-        setInputValue('') // Clear text input when image is dropped
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          setSelectedImage(e.target?.result as string)
+          setInputValue('') // Clear text input when image is dropped
+        }
+        reader.readAsDataURL(file)
+      } else {
+        alert('Please drop an image file')
       }
-      reader.readAsDataURL(file)
     }
   }
 
@@ -71,7 +79,11 @@ export default function Home() {
 
           {/* Universal Input Box */}
           <div 
-            className="relative border-2 border-dashed border-gray-300 rounded-lg focus-within:border-blue-500 transition-colors"
+            className={`relative border-2 border-dashed rounded-lg transition-colors ${
+              selectedImage 
+                ? 'border-gray-300' 
+                : 'border-gray-300 hover:border-gray-400 focus-within:border-blue-500'
+            }`}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
           >
@@ -82,13 +94,27 @@ export default function Home() {
                   src={selectedImage}
                   alt="Selected"
                   fill
-                  className="object-contain"
+                  className="object-contain rounded-lg"
                 />
                 <button
                   onClick={() => setSelectedImage(null)}
-                  className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                  className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+                  title="Remove image"
                 >
-                  ✕
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width="20" 
+                    height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
                 </button>
               </div>
             ) : (
@@ -101,14 +127,28 @@ export default function Home() {
               />
             )}
 
-            {/* Upload Button with new icon */}
+            {/* Upload Button */}
             <div className="absolute bottom-2 right-2">
               <button
                 onClick={() => fileInputRef.current?.click()}
                 className="text-gray-500 hover:text-blue-500 p-2 rounded-full hover:bg-gray-100 transition-colors"
                 title="Upload image"
               >
-                <ImagePlus size={20} />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <path d="M20.4 14.5L16 10 4 20"/>
+                </svg>
               </button>
               <input
                 type="file"
@@ -124,7 +164,7 @@ export default function Home() {
           <button
             onClick={handleSolve}
             disabled={isLoading || (!inputValue && !selectedImage)}
-            className={`w-full mt-4 py-3 px-4 rounded-lg text-white font-medium ${
+            className={`w-full mt-4 py-3 px-4 rounded-lg text-white font-medium transition-colors ${
               isLoading || (!inputValue && !selectedImage)
                 ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-blue-500 hover:bg-blue-600'

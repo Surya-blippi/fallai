@@ -1,8 +1,8 @@
-// src/app/page.tsx
 'use client'
 
 import { useState, useRef } from 'react'
 import Image from 'next/image'
+import { ImagePlus } from 'lucide-react'
 
 export default function Home() {
   const [inputValue, setInputValue] = useState('')
@@ -101,13 +101,14 @@ export default function Home() {
               />
             )}
 
-            {/* Upload Button */}
+            {/* Upload Button with new icon */}
             <div className="absolute bottom-2 right-2">
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="text-blue-500 hover:text-blue-700 p-2"
+                className="text-gray-500 hover:text-blue-500 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                title="Upload image"
               >
-                📎
+                <ImagePlus size={20} />
               </button>
               <input
                 type="file"

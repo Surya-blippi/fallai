@@ -11,35 +11,68 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { text, imageUrl } = body
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: [
-            {
-              type: "text",
-              text: "You are a helpful assistant that solves problems and answers questions clearly and concisely."
-            }
-          ]
-        },
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: text || "Please analyze this image",
-            },
-            ... (imageUrl ? [{
-              type: "image_url",
-              image_url: imageUrl
-            }] : [])
-          ]
-        }
-      ]
-    })
+    if (imageUrl) {
+      // Handle image input
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: [
+              {
+                type: "text",
+                text: "You are a helpful assistant that analyzes images and provides detailed explanations."
+              }
+            ]
+          },
+          {
+            role: "user",
+            content: [
+              { 
+                type: "text", 
+                text: text || "What's in this image?" 
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: imageUrl,
+                  detail: "low" // Add low detail option for faster response
+                }
+              }
+            ]
+          }
+        ]
+      })
 
-    return NextResponse.json({ result: response.choices[0].message.content })
+      return NextResponse.json({ result: response.choices[0].message.content })
+    } else {
+      // Handle text input
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: [
+              {
+                type: "text",
+                text: "You are a helpful assistant that provides clear and detailed answers."
+              }
+            ]
+          },
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: text
+              }
+            ]
+          }
+        ]
+      })
+
+      return NextResponse.json({ result: response.choices[0].message.content })
+    }
   } catch (error) {
     console.error('Error:', error)
     return NextResponse.json(

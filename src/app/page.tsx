@@ -1,3 +1,4 @@
+// src/app/page.tsx
 'use client'
 
 import { useState, useRef } from 'react'
@@ -9,6 +10,55 @@ export default function Home() {
  const [result, setResult] = useState('')
  const [selectedImage, setSelectedImage] = useState<string | null>(null)
  const fileInputRef = useRef<HTMLInputElement>(null)
+
+ const convertToBase64 = (file: File): Promise<string> => {
+   return new Promise((resolve, reject) => {
+     const reader = new FileReader()
+     reader.onload = () => {
+       if (typeof reader.result === 'string') {
+         resolve(reader.result)
+       }
+     }
+     reader.onerror = reject
+     reader.readAsDataURL(file)
+   })
+ }
+
+ const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+   const file = event.target.files?.[0]
+   if (file) {
+     if (file.type.startsWith('image/')) {
+       const base64String = await convertToBase64(file)
+       setSelectedImage(base64String)
+       setInputValue('') // Clear text input when image is selected
+     } else {
+       alert('Please select an image file')
+     }
+   }
+ }
+
+ const handleDrop = async (event: React.DragEvent) => {
+   event.preventDefault()
+   const file = event.dataTransfer.files?.[0]
+   if (file) {
+     if (file.type.startsWith('image/')) {
+       const base64String = await convertToBase64(file)
+       setSelectedImage(base64String)
+       setInputValue('') // Clear text input when image is dropped
+     } else {
+       alert('Please drop an image file')
+     }
+   }
+ }
+
+ const handleDragOver = (event: React.DragEvent) => {
+   event.preventDefault()
+ }
+
+ const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+   setInputValue(e.target.value)
+   setSelectedImage(null) // Clear image when text is entered
+ }
 
  const handleSolve = async () => {
    setIsLoading(true)
@@ -23,6 +73,7 @@ export default function Home() {
      }
 
      if (selectedImage) {
+       // For base64 images, use the base64 string directly
        payload.imageUrl = selectedImage
      }
 
@@ -46,48 +97,6 @@ export default function Home() {
    } finally {
      setIsLoading(false)
    }
- }
-
- const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-   const file = event.target.files?.[0]
-   if (file) {
-     if (file.type.startsWith('image/')) {
-       const reader = new FileReader()
-       reader.onload = (e) => {
-         setSelectedImage(e.target?.result as string)
-         setInputValue('') // Clear text input when image is selected
-       }
-       reader.readAsDataURL(file)
-     } else {
-       alert('Please select an image file')
-     }
-   }
- }
-
- const handleDrop = (event: React.DragEvent) => {
-   event.preventDefault()
-   const file = event.dataTransfer.files?.[0]
-   if (file) {
-     if (file.type.startsWith('image/')) {
-       const reader = new FileReader()
-       reader.onload = (e) => {
-         setSelectedImage(e.target?.result as string)
-         setInputValue('') // Clear text input when image is dropped
-       }
-       reader.readAsDataURL(file)
-     } else {
-       alert('Please drop an image file')
-     }
-   }
- }
-
- const handleDragOver = (event: React.DragEvent) => {
-   event.preventDefault()
- }
-
- const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-   setInputValue(e.target.value)
-   setSelectedImage(null) // Clear image when text is entered
  }
 
  return (
@@ -226,7 +235,7 @@ export default function Home() {
          {result && (
            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
              <h2 className="text-lg font-semibold mb-2">Result</h2>
-             <p className="text-gray-700">{result}</p>
+             <p className="text-gray-700 whitespace-pre-wrap">{result}</p>
            </div>
          )}
        </div>

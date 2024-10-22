@@ -2,6 +2,14 @@
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
+// Define error interface
+interface OpenAIError {
+  message: string;
+  type?: string;
+  code?: string;
+  param?: string;
+}
+
 // Check if API key exists
 const apiKey = process.env.OPENAI_API_KEY
 if (!apiKey) {
@@ -87,10 +95,21 @@ export async function POST(req: Request) {
 
       return NextResponse.json({ result: response.choices[0].message.content })
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error:', error)
+    
+    // Type guard for OpenAI errors
+    if (error && typeof error === 'object' && 'message' in error) {
+      const openAIError = error as OpenAIError
+      return NextResponse.json(
+        { error: openAIError.message },
+        { status: 500 }
+      )
+    }
+
+    // Default error response
     return NextResponse.json(
-      { error: error.message || 'Failed to process request' },
+      { error: 'An unexpected error occurred' },
       { status: 500 }
     )
   }

@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export function middleware(request: NextRequest) {
+export function middleware(_request: NextRequest) {
   // Verify API key exists
   if (!process.env.OPENAI_API_KEY) {
     return NextResponse.json(

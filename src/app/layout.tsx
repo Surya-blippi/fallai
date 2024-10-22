@@ -14,11 +14,11 @@ export const metadata: Metadata = {
   viewport: 'width=device-width, initial-scale=1',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+interface RootLayoutProps {
+  children: React.ReactNode;
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className="h-full">
       <body className={`${inter.className} min-h-screen flex flex-col`}>
@@ -127,12 +127,12 @@ export default function RootLayout({
                 <h3 className="text-sm font-semibold">Social</h3>
                 <ul className="mt-4 space-y-2">
                   <li>
-                    <a href="https://twitter.com" className="text-sm text-gray-600 hover:text-gray-900">
+                    <a href="https://twitter.com" className="text-sm text-gray-600 hover:text-gray-900" target="_blank" rel="noopener noreferrer">
                       Twitter
                     </a>
                   </li>
                   <li>
-                    <a href="https://github.com" className="text-sm text-gray-600 hover:text-gray-900">
+                    <a href="https://github.com" className="text-sm text-gray-600 hover:text-gray-900" target="_blank" rel="noopener noreferrer">
                       GitHub
                     </a>
                   </li>

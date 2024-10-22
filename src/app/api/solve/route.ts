@@ -2,12 +2,26 @@
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
+// Check if API key exists
+const apiKey = process.env.OPENAI_API_KEY
+if (!apiKey) {
+  console.error('OPENAI_API_KEY is not set')
+}
+
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY || '' // Provide empty string as fallback
 })
 
 export async function POST(req: Request) {
   try {
+    // Check if API key is configured
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json(
+        { error: 'OpenAI API key not configured' },
+        { status: 500 }
+      )
+    }
+
     const body = await req.json()
     const { text, imageUrl } = body
 
@@ -36,7 +50,7 @@ export async function POST(req: Request) {
                 type: "image_url",
                 image_url: {
                   url: imageUrl,
-                  detail: "low" // Add low detail option for faster response
+                  detail: "low"
                 }
               }
             ]
@@ -73,10 +87,10 @@ export async function POST(req: Request) {
 
       return NextResponse.json({ result: response.choices[0].message.content })
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error:', error)
     return NextResponse.json(
-      { error: 'Failed to process request' },
+      { error: error.message || 'Failed to process request' },
       { status: 500 }
     )
   }

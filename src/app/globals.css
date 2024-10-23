@@ -1,3 +1,4 @@
+/* Add this to your globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,6 +10,10 @@
   --step-background: #f8fafc;
   --final-answer-background: #f0fdf4;
   --border-color: #e5e7eb;
+  --math-background: #fcfcfc;
+  --step-border: #3b82f6;
+  --final-border: #22c55e;
+  --hover-background: #f3f4f6;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,6 +24,10 @@
     --step-background: #1a1a1a;
     --final-answer-background: #132516;
     --border-color: #2d2d2d;
+    --math-background: #1d1d1d;
+    --step-border: #60a5fa;
+    --final-border: #4ade80;
+    --hover-background: #262626;
   }
 }
 
@@ -38,69 +47,132 @@ body {
   color: var(--foreground);
 }
 
-/* Step styling */
+/* Step styling with enhanced visual hierarchy */
 .solution-step {
-  margin: 1.5rem 0;
-  padding: 1rem;
+  margin: 2rem 0;
+  padding: 1.5rem;
   background-color: var(--step-background);
-  border-radius: 0.5rem;
-  border-left: 4px solid #3b82f6;
+  border-radius: 0.75rem;
+  border-left: 4px solid var(--step-border);
   color: var(--foreground);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.solution-step:hover {
+  transform: translateX(4px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .step-content {
-  margin-left: 0.5rem;
+  margin-left: 0.75rem;
 }
 
-/* Math display styling */
+/* Enhanced math display styling */
 .math-block {
-  margin: 1.2rem 0;
-  padding: 0.5rem;
-  background-color: var(--card-background);
-  border-radius: 0.375rem;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: var(--math-background);
+  border-radius: 0.5rem;
   overflow-x: auto;
+  border: 1px solid var(--border-color);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .katex-display {
-  margin: 0.5rem 0 !important;
+  margin: 0.75rem 0 !important;
+  padding: 0.5rem 0;
 }
 
 .katex {
-  font-size: 1.1em;
+  font-size: 1.15em;
 }
 
-/* Final answer styling */
+/* Improved final answer styling */
 .final-answer {
-  margin: 1.5rem 0;
-  padding: 1rem;
+  margin: 2.5rem 0 1.5rem 0;
+  padding: 1.5rem;
   background-color: var(--final-answer-background);
-  border-radius: 0.5rem;
-  border-left: 4px solid #22c55e;
+  border-radius: 0.75rem;
+  border-left: 4px solid var(--final-border);
   font-weight: 500;
   color: var(--foreground);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  position: relative;
 }
 
-/* Regular text styling */
+.final-answer::before {
+  content: "Final Answer";
+  position: absolute;
+  top: -0.875rem;
+  left: 1rem;
+  background-color: var(--final-border);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Enhanced text styling */
 .solution-text {
-  margin: 1rem 0;
-  line-height: 1.8;
+  margin: 1.25rem 0;
+  line-height: 1.9;
   color: var(--foreground);
+  padding: 0.5rem 0;
 }
 
-/* Result container styling */
+/* Improved result container styling */
 .result-container {
   background-color: var(--card-background);
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  margin-top: 2rem;
 }
 
 .result-header {
   border-bottom: 1px solid var(--border-color);
-  padding: 1rem;
-  margin-bottom: 1rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 1rem 1rem 0 0;
+  background-color: var(--step-background);
 }
 
-/* Dark mode KaTeX adjustments */
+.result-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* Step numbering */
+.solution-step {
+  counter-increment: step;
+}
+
+.step-content::before {
+  content: "Step " counter(step);
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--step-border);
+}
+
+/* Equation labels */
+.math-block {
+  position: relative;
+}
+
+.math-block::after {
+  content: "(" counter(step) ")";
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--foreground);
+  opacity: 0.5;
+}
+
+/* Dark mode enhancements */
 @media (prefers-color-scheme: dark) {
   .katex {
     color: var(--foreground);
@@ -109,4 +181,36 @@ body {
   .katex-display > .katex > .katex-html {
     color: var(--foreground);
   }
+
+  .math-block {
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.05);
+  }
+
+  .solution-step,
+  .final-answer {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .result-container {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Scrollbar styling */
+.math-block::-webkit-scrollbar {
+  height: 6px;
+}
+
+.math-block::-webkit-scrollbar-track {
+  background: var(--step-background);
+  border-radius: 3px;
+}
+
+.math-block::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.math-block::-webkit-scrollbar-thumb:hover {
+  background: var(--step-border);
 }

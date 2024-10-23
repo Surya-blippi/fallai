@@ -16,9 +16,7 @@ export default function Home() {
      const reader = new FileReader()
      reader.onload = () => {
        if (typeof reader.result === 'string') {
-         // Extract the base64 part from the data URL
-         const base64String = reader.result.split(',')[1]
-         resolve(`data:${file.type};base64,${base64String}`)
+         resolve(reader.result) // Keep the full data URL
        }
      }
      reader.onerror = reject
@@ -74,7 +72,7 @@ export default function Home() {
 
  const handleSolve = async () => {
    setIsLoading(true)
-   setResult('')  // Clear previous result
+   setResult('')
    
    try {
      const payload: {
@@ -82,11 +80,14 @@ export default function Home() {
        imageUrl?: string
      } = {}
 
+     // If it's a text input
      if (inputValue) {
        payload.text = inputValue
      }
 
+     // If it's an image input
      if (selectedImage) {
+       payload.text = inputValue || "What's in this image?" // Default prompt if no text
        payload.imageUrl = selectedImage
      }
 
@@ -99,17 +100,15 @@ export default function Home() {
      })
 
      if (!response.ok) {
-       throw new Error('Failed to get response')
+       const errorData = await response.json()
+       throw new Error(errorData.error || 'Failed to process request')
      }
 
      const data = await response.json()
-     if (data.error) {
-       throw new Error(data.error)
-     }
      setResult(data.result)
    } catch (error) {
      console.error('Error:', error)
-     setResult('An error occurred while processing your request')
+     setResult(error instanceof Error ? error.message : 'An error occurred while processing your request')
    } finally {
      setIsLoading(false)
    }

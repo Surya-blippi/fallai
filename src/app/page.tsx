@@ -1,8 +1,10 @@
 // src/app/page.tsx
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
+import 'katex/dist/katex.min.css'
+import renderMathInElement from 'katex/dist/contrib/auto-render'
 
 export default function Home() {
  const [inputValue, setInputValue] = useState('')
@@ -10,6 +12,21 @@ export default function Home() {
  const [result, setResult] = useState('')
  const [selectedImage, setSelectedImage] = useState<string | null>(null)
  const fileInputRef = useRef<HTMLInputElement>(null)
+
+ // Add useEffect for KaTeX rendering
+ useEffect(() => {
+   if (result) {
+     renderMathInElement(document.querySelector('.math-result')!, {
+       delimiters: [
+         { left: '$$', right: '$$', display: true },
+         { left: '$', right: '$', display: false },
+         { left: '\\(', right: '\\)', display: false },
+         { left: '\\[', right: '\\]', display: true },
+       ],
+       throwOnError: false
+     })
+   }
+ }, [result])
 
  const convertToBase64 = (file: File): Promise<string> => {
    return new Promise((resolve, reject) => {
@@ -87,7 +104,7 @@ export default function Home() {
 
      // If it's an image input
      if (selectedImage) {
-       payload.text = inputValue || "What's in this image?" // Default prompt if no text
+       payload.text = inputValue || "Solve this math problem with proper LaTeX formatting:" // Default prompt if no text
        payload.imageUrl = selectedImage
      }
 
@@ -249,8 +266,10 @@ export default function Home() {
          {/* Result Area */}
          {result && (
            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-             <h2 className="text-lg font-semibold mb-2">Result</h2>
-             <p className="text-gray-700 whitespace-pre-wrap">{result}</p>
+             <h2 className="text-lg font-semibold mb-2">Solution</h2>
+             <div className="math-result prose prose-sm max-w-none text-gray-700">
+               {result}
+             </div>
            </div>
          )}
        </div>

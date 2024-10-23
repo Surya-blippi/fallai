@@ -12,7 +12,7 @@ const renderMath = (text: string) => {
     const steps = text.split('\n\n').filter(step => step.trim() !== '')
 
     // Process each step
-    const processedSteps = steps.map(step => {  // Removed unused 'index' parameter
+    const processedSteps = steps.map(step => {
       // Replace math blocks with KaTeX rendered HTML
       let processedStep = step.replace(/\$\$([\s\S]*?)\$\$/g, (_, tex) => {
         return `<div class="math-block">${katex.renderToString(tex, { displayMode: true, throwOnError: false })}</div>`
@@ -117,25 +117,35 @@ export default function Home() {
       } = {}
 
       if (inputValue) {
-        payload.text = inputValue
+        const textPrompt = `Please solve this problem using proper mathematical notation. Show each step clearly and format all math expressions using LaTeX:
+        - Use $$...$$ for displayed equations
+        - Use \\frac{}{} for fractions
+        - Use \\sqrt{} for roots
+        - Use proper mathematical symbols (\\pi, \\infty, \\theta, etc.)
+        - Use \\cdot or \\times for multiplication
+        - Format powers using ^
+        - Format all trigonometric functions properly (\\sin, \\cos, \\tan)
+        - Box the final answer using \\boxed{}
+
+        ${inputValue}`
+
+        payload.text = textPrompt
       }
 
       if (selectedImage) {
-        payload.text = inputValue || `Analyze and solve this math problem step by step. Format your response as follows:
+        payload.text = inputValue || `Please solve this math problem using proper mathematical notation and LaTeX formatting. Follow these formatting rules:
 
-Step 1: State the given equation or problem
-Write the equation using LaTeX math mode $$ for display equations
+        1. Use $...$ for inline math and $$...$$ for displayed equations
+        2. Use \\frac{a}{b} for fractions instead of writing "a/b"
+        3. Use \\sqrt{x} for square roots
+        4. Use proper symbols: \\pi for π, \\theta for θ
+        5. Use \\cdot or \\times for multiplication
+        6. Format powers using ^ (e.g., x^2)
+        7. Use \\tan, \\sin, \\cos for trigonometric functions
+        8. Use \\boxed{} for final answers
+        9. Format each step clearly with proper mathematical notation
 
-Step 2: Break down the solution process
-Explain each mathematical operation in clear terms, using inline LaTeX $ for variables and small expressions
-
-Step 3: Show the step-by-step calculations
-Present each calculation step in display math mode $$
-
-Final Answer: Present the final result
-Box the answer using LaTeX \\boxed{} command
-
-Please ensure clear explanations between mathematical steps.`
+        Show each step of your solution process clearly and ensure all mathematical expressions are properly formatted.`
         payload.imageUrl = selectedImage
       }
 
@@ -164,7 +174,7 @@ Please ensure clear explanations between mathematical steps.`
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto"> {/* Increased max-width for better readability */}
+      <div className="max-w-3xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-6">
           {/* Header */}
           <div className="text-center mb-8">

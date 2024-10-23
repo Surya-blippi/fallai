@@ -19,3 +19,17 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Add to src/app/globals.css */
+@import 'katex/dist/katex.min.css';
+
+.katex-display {
+  margin: 1em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.math-result {
+  font-size: 1.1em;
+  line-height: 1.5;
+}

@@ -20,32 +20,70 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Add to src/app/globals.css */
 @import 'katex/dist/katex.min.css';
 
-.katex-display {
-  margin: 1em 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-
-.math-result {
-  font-size: 1.1em;
-  line-height: 1.5;
-}
-
-@import 'katex/dist/katex.min.css';
-
+/* Base styles for the solution container */
 .prose {
   max-width: none;
+  line-height: 1.8;
+  font-size: 1.1rem;
+}
+
+/* Step styling */
+.solution-step {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border-radius: 0.5rem;
+  border-left: 4px solid #3b82f6;
+}
+
+.step-content {
+  margin-left: 0.5rem;
+}
+
+/* Math display styling */
+.math-block {
+  margin: 1.2rem 0;
+  padding: 0.5rem;
+  background-color: #ffffff;
+  border-radius: 0.375rem;
+  overflow-x: auto;
 }
 
 .katex-display {
-  margin: 1em 0;
-  overflow-x: auto;
-  overflow-y: hidden;
+  margin: 0.5rem 0 !important;
 }
 
-.prose .katex {
+.katex {
   font-size: 1.1em;
+}
+
+/* Final answer styling */
+.final-answer {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: #f0fdf4;
+  border-radius: 0.5rem;
+  border-left: 4px solid #22c55e;
+  font-weight: 500;
+}
+
+/* Regular text styling */
+.solution-text {
+  margin: 1rem 0;
+  line-height: 1.8;
+}
+
+/* Result container styling */
+.result-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.result-header {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem;
+  margin-bottom: 1rem;
 }

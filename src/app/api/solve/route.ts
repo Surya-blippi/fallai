@@ -2,13 +2,6 @@
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
-interface OpenAIError {
-  message: string;
-  type?: string;
-  code?: string;
-  param?: string;
-}
-
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || ''
 })
@@ -29,16 +22,30 @@ export async function POST(req: Request) {
     const isImageInput = Boolean(imageUrl)
 
     if (isImageInput) {
-      // Handle image analysis
+      // Handle image analysis with specific instruction for math problems
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
+          {
+            role: "system",
+            content: [
+              {
+                type: "text",
+                text: `You are a math tutor. When you see a math problem:
+                1. Identify the equation
+                2. Provide a step-by-step solution
+                3. Show each step clearly with explanations
+                4. Highlight the final answer
+                Do not describe the image - solve the math problem shown in it.`
+              }
+            ]
+          },
           {
             role: "user",
             content: [
               { 
                 type: "text", 
-                text: text || "What's in this image?" 
+                text: "Solve this math problem step by step:" 
               },
               {
                 type: "image_url",
@@ -71,9 +78,8 @@ export async function POST(req: Request) {
     console.error('API Error:', error)
     
     if (error && typeof error === 'object' && 'message' in error) {
-      const openAIError = error as OpenAIError
       return NextResponse.json(
-        { error: openAIError.message },
+        { error: (error as {message: string}).message },
         { status: 500 }
       )
     }

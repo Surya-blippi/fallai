@@ -18,11 +18,7 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { text, imageUrl } = body
 
-    // Check if this is an image request
-    const isImageInput = Boolean(imageUrl)
-
-    if (isImageInput) {
-      // Handle image analysis with specific instruction for math problems
+    if (imageUrl) {
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
@@ -31,12 +27,14 @@ export async function POST(req: Request) {
             content: [
               {
                 type: "text",
-                text: `You are a math tutor. When you see a math problem:
-                1. Identify the equation
-                2. Provide a step-by-step solution
-                3. Show each step clearly with explanations
-                4. Highlight the final answer
-                Do not describe the image - solve the math problem shown in it.`
+                text: `You are a math tutor. For any math problem:
+                1. Use proper LaTeX formatting for all mathematical expressions
+                2. Format steps clearly with markdown headers
+                3. Use align environment for equation steps
+                4. Use proper mathematical notation (\frac, \times, etc.)
+                5. Box the final answer using \boxed
+                6. Include verification when applicable
+                Ensure all LaTeX is properly escaped and formatted.`
               }
             ]
           },
@@ -45,7 +43,7 @@ export async function POST(req: Request) {
             content: [
               { 
                 type: "text", 
-                text: "Solve this math problem step by step:" 
+                text: "Solve this math problem with proper LaTeX formatting:" 
               },
               {
                 type: "image_url",
@@ -76,14 +74,12 @@ export async function POST(req: Request) {
 
   } catch (error: unknown) {
     console.error('API Error:', error)
-    
     if (error && typeof error === 'object' && 'message' in error) {
       return NextResponse.json(
         { error: (error as {message: string}).message },
         { status: 500 }
       )
     }
-
     return NextResponse.json(
       { error: 'An unexpected error occurred' },
       { status: 500 }

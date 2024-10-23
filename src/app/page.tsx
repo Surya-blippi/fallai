@@ -3,8 +3,35 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
+import katex from 'katex'
 import 'katex/dist/katex.min.css'
-import renderMathInElement from 'katex/dist/contrib/auto-render'
+
+// Create a function to render math
+const renderMath = (text: string) => {
+ try {
+   return text.split('$$').map((part, index) => {
+     if (index % 2 === 1) {
+       // This is LaTeX content
+       return katex.renderToString(part, {
+         throwOnError: false,
+         displayMode: true
+       });
+     }
+     // Process inline math between \( and \)
+     return part.split('\\(').map((subPart, subIndex) => {
+       if (subIndex === 0) return subPart;
+       const [math, ...rest] = subPart.split('\\)');
+       return katex.renderToString(math, {
+         throwOnError: false,
+         displayMode: false
+       }) + rest.join('\\)');
+     }).join('');
+   }).join('');
+ } catch (error) {
+   console.error('Math rendering error:', error);
+   return text;
+ }
+};
 
 export default function Home() {
  const [inputValue, setInputValue] = useState('')
@@ -13,20 +40,14 @@ export default function Home() {
  const [selectedImage, setSelectedImage] = useState<string | null>(null)
  const fileInputRef = useRef<HTMLInputElement>(null)
 
- // Add useEffect for KaTeX rendering
  useEffect(() => {
    if (result) {
-     renderMathInElement(document.querySelector('.math-result')!, {
-       delimiters: [
-         { left: '$$', right: '$$', display: true },
-         { left: '$', right: '$', display: false },
-         { left: '\\(', right: '\\)', display: false },
-         { left: '\\[', right: '\\]', display: true },
-       ],
-       throwOnError: false
-     })
+     const mathResult = document.querySelector('.math-result');
+     if (mathResult) {
+       mathResult.innerHTML = renderMath(result);
+     }
    }
- }, [result])
+ }, [result]);
 
  const convertToBase64 = (file: File): Promise<string> => {
    return new Promise((resolve, reject) => {
@@ -104,7 +125,7 @@ export default function Home() {
 
      // If it's an image input
      if (selectedImage) {
-       payload.text = inputValue || "Solve this math problem with proper LaTeX formatting:" // Default prompt if no text
+       payload.text = inputValue || "Solve this math problem with proper LaTeX formatting and show step by step solution:" // Default prompt if no text
        payload.imageUrl = selectedImage
      }
 
@@ -138,7 +159,7 @@ export default function Home() {
          {/* Header */}
          <div className="text-center mb-8">
            <h1 className="text-3xl font-bold text-gray-900">Fallai Solver</h1>
-           <p className="mt-2 text-gray-600">Type or upload an image</p>
+           <p className="mt-2 text-gray-600">Type or upload an image of a math problem</p>
          </div>
 
          {/* Universal Input Box */}
@@ -187,7 +208,7 @@ export default function Home() {
                value={inputValue}
                onChange={handleInputChange}
                className="w-full h-32 p-4 rounded-lg focus:outline-none resize-none"
-               placeholder="Type your question or drop an image here..."
+               placeholder="Type your math problem or drop an image here..."
              />
            )}
 
@@ -267,9 +288,12 @@ export default function Home() {
          {result && (
            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
              <h2 className="text-lg font-semibold mb-2">Solution</h2>
-             <div className="math-result prose prose-sm max-w-none text-gray-700">
-               {result}
-             </div>
+             <div 
+               className="math-result prose prose-sm max-w-none text-gray-700"
+               dangerouslySetInnerHTML={{ 
+                 __html: renderMath(result)
+               }}
+             />
            </div>
          )}
        </div>

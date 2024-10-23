@@ -12,7 +12,7 @@ const renderMath = (text: string) => {
     const steps = text.split('\n\n').filter(step => step.trim() !== '')
 
     // Process each step
-    const processedSteps = steps.map((step, index) => {
+    const processedSteps = steps.map(step => {  // Removed unused 'index' parameter
       // Replace math blocks with KaTeX rendered HTML
       let processedStep = step.replace(/\$\$([\s\S]*?)\$\$/g, (_, tex) => {
         return `<div class="math-block">${katex.renderToString(tex, { displayMode: true, throwOnError: false })}</div>`

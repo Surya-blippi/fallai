@@ -26,7 +26,9 @@ const renderMath = (text: string) => {
       // Add step number if it starts with "Step"
       if (processedStep.toLowerCase().startsWith('step')) {
         return `<div class="solution-step"><div class="step-content">${processedStep}</div></div>`
-      } else if (processedStep.toLowerCase().includes('final answer') || processedStep.toLowerCase().includes('therefore')) {
+      } else if (processedStep.toLowerCase().includes('final answer') || 
+                 processedStep.toLowerCase().includes('therefore') ||
+                 processedStep.toLowerCase().includes('boxed')) {
         return `<div class="final-answer">${processedStep}</div>`
       } else {
         return `<div class="solution-text">${processedStep}</div>`
@@ -116,37 +118,78 @@ export default function Home() {
         imageUrl?: string
       } = {}
 
-      if (inputValue) {
-        const textPrompt = `Please solve this problem using proper mathematical notation. Show each step clearly and format all math expressions using LaTeX:
-        - Use $$...$$ for displayed equations
-        - Use \\frac{}{} for fractions
-        - Use \\sqrt{} for roots
-        - Use proper mathematical symbols (\\pi, \\infty, \\theta, etc.)
-        - Use \\cdot or \\times for multiplication
-        - Format powers using ^
-        - Format all trigonometric functions properly (\\sin, \\cos, \\tan)
-        - Box the final answer using \\boxed{}
-
-        ${inputValue}`
-
-        payload.text = textPrompt
-      }
-
       if (selectedImage) {
-        payload.text = inputValue || `Please solve this math problem using proper mathematical notation and LaTeX formatting. Follow these formatting rules:
+        payload.text = inputValue || `Analyze and solve this math problem. 
+Format the solution using proper mathematical notation and LaTeX, following these exact rules:
 
-        1. Use $...$ for inline math and $$...$$ for displayed equations
-        2. Use \\frac{a}{b} for fractions instead of writing "a/b"
-        3. Use \\sqrt{x} for square roots
-        4. Use proper symbols: \\pi for π, \\theta for θ
-        5. Use \\cdot or \\times for multiplication
-        6. Format powers using ^ (e.g., x^2)
-        7. Use \\tan, \\sin, \\cos for trigonometric functions
-        8. Use \\boxed{} for final answers
-        9. Format each step clearly with proper mathematical notation
+1. Start with the given problem using display math:
+Example for an equation:
+$$\\text{Given: } 3x + 45 = 100$$
+Example for a trig problem:
+$$\\text{Find } \\tan(\\frac{2\\pi}{3})$$
 
-        Show each step of your solution process clearly and ensure all mathematical expressions are properly formatted.`
+2. Show step-by-step solution, with EACH mathematical expression properly formatted:
+- Use $$...$$ for ALL equation steps
+- ALWAYS use \\frac{a}{b} for fractions
+- ALWAYS use \\sqrt{x} for square roots
+- ALWAYS use proper functions (\\sin, \\cos, \\tan, \\log)
+- ALWAYS use proper symbols (\\pi, \\infty, \\theta)
+- ALWAYS use \\cdot or \\times for multiplication
+- ALWAYS use proper exponents with ^
+- Format matrices using \\begin{pmatrix} or \\begin{bmatrix}
+- Use \\rightarrow or \\implies for implications
+- Use \\therefore for "therefore"
+- Add proper spacing using \\quad or \\;
+
+3. Format each new step as:
+$$\\text{Step 1: } [equation]$$
+$$\\text{Step 2: } [equation]$$
+And so on...
+
+4. For trigonometry:
+- Use \\sin, \\cos, \\tan properly
+- Format inverse functions as \\sin^{-1}, \\cos^{-1}, \\tan^{-1}
+- Use \\degree for degrees
+- Format angles in radians using \\pi
+- Use proper interval notation: (-\\infty, \\infty)
+
+5. For algebra:
+- Format exponents using proper notation: x^2, e^x
+- Use \\sqrt{} for square roots
+- Use \\cdot for multiplication
+- Use proper subscripts with _
+
+6. For calculus:
+- Format derivatives using \\frac{d}{dx}
+- Format integrals using \\int_{a}^{b}
+- Use proper limit notation \\lim_{x \\to a}
+
+7. Always include a final boxed answer:
+$$\\boxed{\\text{Final Answer: } expression}$$
+
+Remember:
+- EVERY mathematical expression must be properly formatted
+- Use display math ($$...$$) for equations
+- Use inline math ($...$) for mathematical terms in text
+- Show clear reasoning between steps
+- Format EACH step consistently
+- Add explanatory text between steps when needed`
+
         payload.imageUrl = selectedImage
+      } else if (inputValue) {
+        payload.text = `Please solve this problem using proper mathematical notation. Format ALL mathematical expressions using LaTeX:
+
+${inputValue}
+
+Remember to:
+- Use $$...$$ for displayed equations
+- Use $...$ for inline math
+- Use \\frac{a}{b} for fractions
+- Use \\sqrt{} for roots
+- Use proper symbols (\\pi, \\theta, etc.)
+- Format all mathematical expressions properly
+- Show clear steps
+- Box the final answer using \\boxed{}`
       }
 
       const response = await fetch('/api/solve', {

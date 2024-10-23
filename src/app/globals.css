@@ -1,4 +1,3 @@
-/* Add this to your globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -157,22 +156,26 @@ body {
   color: var(--step-border);
 }
 
-/* Equation labels */
-.math-block {
-  position: relative;
+/* Scrollbar styling */
+.math-block::-webkit-scrollbar {
+  height: 6px;
 }
 
-.math-block::after {
-  content: "(" counter(step) ")";
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--foreground);
-  opacity: 0.5;
+.math-block::-webkit-scrollbar-track {
+  background: var(--step-background);
+  border-radius: 3px;
 }
 
-/* Dark mode enhancements */
+.math-block::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.math-block::-webkit-scrollbar-thumb:hover {
+  background: var(--step-border);
+}
+
+/* Dark mode adjustments */
 @media (prefers-color-scheme: dark) {
   .katex {
     color: var(--foreground);
@@ -194,23 +197,4 @@ body {
   .result-container {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
   }
-}
-
-/* Scrollbar styling */
-.math-block::-webkit-scrollbar {
-  height: 6px;
-}
-
-.math-block::-webkit-scrollbar-track {
-  background: var(--step-background);
-  border-radius: 3px;
-}
-
-.math-block::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 3px;
-}
-
-.math-block::-webkit-scrollbar-thumb:hover {
-  background: var(--step-border);
 }

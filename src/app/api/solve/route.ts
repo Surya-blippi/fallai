@@ -25,17 +25,11 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { text, imageUrl } = body
 
-    if (imageUrl) {
-      // Handle image input
-      // Check if it's a base64 image
-      const isBase64Image = imageUrl.startsWith('data:image')
-      const imageUrlToSend = isBase64Image 
-        ? imageUrl  // Use base64 string directly if it's already in base64
-        : {         // Use URL if it's an external image
-            url: imageUrl,
-            detail: "low"
-          }
+    // Check if this is an image request
+    const isImageInput = Boolean(imageUrl)
 
+    if (isImageInput) {
+      // Handle image analysis
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
@@ -44,50 +38,37 @@ export async function POST(req: Request) {
             content: [
               { 
                 type: "text", 
-                text: text || "Please analyze this image and provide a detailed explanation:" 
+                text: text || "What's in this image?" 
               },
               {
                 type: "image_url",
-                image_url: imageUrlToSend
+                image_url: {
+                  url: imageUrl
+                }
               }
             ]
           }
         ]
-      })
-
+      });
+      
       return NextResponse.json({ result: response.choices[0].message.content })
-
     } else {
       // Handle text-only input
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
           {
-            role: "system",
-            content: [
-              {
-                type: "text",
-                text: "You are a helpful assistant that provides clear and detailed answers."
-              }
-            ]
-          },
-          {
             role: "user",
-            content: [
-              {
-                type: "text",
-                text: text
-              }
-            ]
+            content: text
           }
         ]
-      })
+      });
 
       return NextResponse.json({ result: response.choices[0].message.content })
     }
 
   } catch (error: unknown) {
-    console.error('Error:', error)
+    console.error('API Error:', error)
     
     if (error && typeof error === 'object' && 'message' in error) {
       const openAIError = error as OpenAIError
